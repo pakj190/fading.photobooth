@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camera Background Effect</title>
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        background: black;
+        overflow: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        font-family: Arial, sans-serif;
+    }
+
+    /* Centered camera image */
+    #camera {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        width: 200px;
+        height: auto;
+    }
+
+    /* Random text elements */
+    .floating-text {
+        position: absolute;
+        color: white;
+        opacity: 0.5;
+        white-space: nowrap;
+        pointer-events: none;
+        font-size: 12px; /* small default size */
+        animation: fadeInOut 10s infinite; /* slow fade */
+    }
+
+    /* Glow effect */
+    .glow {
+        opacity: 1; /* full opacity for glowing */
+        text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #0ff;
+    }
+
+    @keyframes fadeInOut {
+        0%, 100% { opacity: 0; }
+        50% { opacity: 1; }
+    }
+</style>
+</head>
+<body>
+
+<img id="camera" src="camera.png" alt="Camera">
+
+<script>
+    const texts = [
+        "Hello World", "Camera Ready", "Flash!", "Focus", 
+        "Click!", "Photography", "Snapshot", "Lens", "Shutter"
+    ];
+
+    const fonts = [
+        "Arial", "Verdana", "Tahoma", "Georgia", "Courier New", "Impact", "Comic Sans MS"
+    ];
+
+    function createRandomText() {
+        const text = document.createElement('div');
+        text.classList.add('floating-text');
+
+        // Random text content
+        text.innerText = texts[Math.floor(Math.random() * texts.length)];
+
+        // Random font
+        text.style.fontFamily = fonts[Math.floor(Math.random() * fonts.length)];
+
+        // Random position
+        text.style.top = Math.random() * window.innerHeight + 'px';
+        text.style.left = Math.random() * window.innerWidth + 'px';
+
+        // Random small size
+        text.style.fontSize = (10 + Math.random() * 14) + 'px'; // 10px to 24px
+
+        // Random glow
+        if (Math.random() > 0.5) {
+            text.classList.add('glow');
+        } else {
+            text.style.opacity = 0.5; // semi-transparent for non-glow
+        }
+
+        // Random fade animation duration (slow)
+        const duration = 8 + Math.random() * 6; // 8s to 14s
+        text.style.animationDuration = duration + 's';
+
+        document.body.appendChild(text);
+
+        // Remove after duration
+        setTimeout(() => {
+            text.remove();
+        }, duration * 1000);
+    }
+
+    // Create random texts continuously
+    setInterval(createRandomText, 700);
+</script>
+</body>
+</html>
