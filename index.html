@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fading Memories Start</title>
+
+<style>
+    body {
+        background: #000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        overflow: hidden;
+        font-family: "Segoe UI", Arial, sans-serif;
+    }
+
+    /* START BUTTON */
+    .start-button {
+        padding: 22px 60px;
+        font-size: 34px;
+        letter-spacing: 2px;
+        color: #fff6d6;
+        background: transparent;
+        border: 3px solid #fff0b3;
+        border-radius: 12px;
+        cursor: pointer;
+        opacity: 0;
+
+        animation: fadingMemory 4s ease-out forwards;
+        z-index: 2;
+    }
+
+    /* Yellow / cream flickering memory animation */
+    @keyframes fadingMemory {
+        0% {
+            opacity: 0;
+            box-shadow: none;
+        }
+        8% {
+            opacity: 0.15;
+            box-shadow: 0 0 5px #ffe9a4;
+        }
+        16% {
+            opacity: 0.05;
+            box-shadow: 0 0 2px #ffdf8c;
+        }
+        26% {
+            opacity: 0.25;
+            box-shadow: 0 0 12px #ffe6a0;
+        }
+        40% {
+            opacity: 0.1;
+            box-shadow: 0 0 3px #ffe099;
+        }
+        58% {
+            opacity: 0.3;
+            box-shadow: 0 0 15px #ffeab0;
+        }
+        72% { 
+            opacity: 0.18;
+            box-shadow: 0 0 8px #ffe2a6;
+        }
+        85% {
+            opacity: 0.5;
+            box-shadow: 0 0 20px #ffeebf;
+        }
+        95% {
+            opacity: 0.8;
+            box-shadow: 0 0 30px #fff3cc;
+        }
+        100% {
+            opacity: 1;
+            box-shadow: 
+                0 0 40px #ffe9a4,
+                0 0 90px #ffe9a4,
+                0 0 140px #ffe9a4;
+            color: #fff7dd;
+            border-color: #fff7dd;
+        }
+    }
+
+    .start-button:hover {
+        box-shadow:
+            0 0 60px #ffe9a4,
+            0 0 120px #ffe9a4,
+            0 0 200px #ffe9a4;
+    }
+
+    /* —— Fog Layer —— */
+    .fog {
+        position: absolute;
+        bottom: 0;
+        width: 200%;
+        height: 40%;
+        pointer-events: none;
+        background: radial-gradient(
+            ellipse at bottom,
+            rgba(255,255,255,0.25) 0%,
+            rgba(255,255,255,0.1) 40%,
+            rgba(255,255,255,0) 80%
+        );
+        animation: fogDrift 12s infinite linear;
+        filter: blur(18px);
+        opacity: 0.65;
+        z-index: 1;
+    }
+
+    /* Second fog layer for depth */
+    .fog2 {
+        position: absolute;
+        bottom: -10%;
+        width: 230%;
+        height: 50%;
+        background: radial-gradient(
+            ellipse at bottom,
+            rgba(255,255,255,0.2) 0%,
+            rgba(255,255,255,0.07) 40%,
+            rgba(255,255,255,0) 80%
+        );
+        animation: fogDrift2 10s infinite linear;
+        filter: blur(22px);
+        opacity: 0.5;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    /* Fog movement animations */
+   /* Fog movement animations — faster + more upward rise */
+    @keyframes fogDrift {
+        0%   { transform: translateX(-20%) translateY(20px); }
+        50%  { transform: translateX(-10%) translateY(-40px); }
+        100% { transform: translateX(-20%) translateY(20px); }
+    }
+
+    @keyframes fogDrift2 {
+        0%   { transform: translateX(-30%) translateY(30px); }
+        50%  { transform: translateX(-15%) translateY(-60px); }
+        100% { transform: translateX(-30%) translateY(30px); }
+    }
+
+</style>
+</head>
+
+<body>
+
+<button class="start-button">START</button>
+
+<div class="fog"></div>
+<div class="fog2"></div>
+
+</body>
+</html>
