@@ -41,11 +41,10 @@
         }
 
         video, canvas {
-            width: 480px;       /* smaller default width for desktop */
-            height: 480 * 5 / 4; /* maintain 4:5 aspect ratio */
+            width: 480px;
+            height: 480 * 5 / 4;
             object-fit: cover;
         }
-
 
         canvas {
             display: none;
@@ -117,13 +116,13 @@
         }
 
         .floatText {
-            font-size: 12px;        /* smaller text */
+            font-size: 12px;
             color: white;
             margin-top: 4px;
             text-shadow: 1px 1px 2px black;
             font-weight: bold;
-            max-width: 150px;       /* limit width */
-            word-wrap: break-word;  /* wrap long text */
+            max-width: 150px;
+            word-wrap: break-word;
         }
 
         @keyframes floatAround {
@@ -134,7 +133,6 @@
             100% { transform: translate(-50px, -30px); }
         }
 
-        /* Digital Clock Styling at bottom-right, glowing yellow, bold */
         #clockWrapper {
             position: absolute;
             bottom: 20px;       
@@ -169,7 +167,7 @@
 
         #userText {
             background: transparent;
-            color: white; /* keep this */
+            color: white;
             outline: 2px solid rgba(0, 0, 0, 0.3);
             border-radius: 4px;
             padding: 8px 12px;
@@ -183,7 +181,6 @@
             color: #ffffff;
         }
 
-        /* Typewriter effect */
         #typewriter {
             position: absolute;
             top: 20px;
@@ -196,26 +193,25 @@
             overflow: hidden;
         }
 
-        /* Responsive for mobile devices */
         @media (max-width: 1200px) {
             #clockWrapper {
                 bottom: 10px;
                 right: 50%;
                 transform: translateX(50%);
                 text-align: center;
-                z-index: 1;  /* move behind floating images */
+                z-index: 1;
             }
 
             #clockDisplay {
-                font-size: 20px; /* smaller clock */
-                color: rgba(255,156,169,0.3);  /* softer background glow */
+                font-size: 20px;
+                color: rgba(255,156,169,0.3);
                 text-shadow: 0 0 20px rgba(255,156,169,0.3), 0 0 40px rgba(255,161,117,0.3);
             }
 
             #dateDisplay {
-                font-size: 10px; /* smaller date */
+                font-size: 10px;
                 margin-bottom: 2px;
-                color: rgba(255,156,169,0.3); /* softer background glow */
+                color: rgba(255,156,169,0.3);
                 text-shadow: 0 0 15px rgba(255,156,169,0.3), 0 0 25px rgba(255,161,117,0.3);
             }
 
@@ -223,16 +219,16 @@
                 top: 10px;
                 left: 50%;
                 transform: translateX(-50%);
-                font-size: 16px; /* smaller typewriter text */
-                max-width: 80%;   /* fit within the screen */
-                white-space: normal; /* allow wrapping */
-                text-align: center;  /* center the text */
-                overflow: hidden;    /* optional: hide overflow */
+                font-size: 16px;
+                max-width: 80%;
+                white-space: normal;
+                text-align: center;
+                overflow: hidden;
                 margin: 0 auto; 
             }
 
             #userText {
-                width: 180px; /* fit smaller screen */
+                width: 180px;
                 font-size: 14px;
                 padding: 6px 10px;
             }
@@ -242,19 +238,19 @@
             }
 
             .floatText {
-                font-size: 8px; /* smaller floating text */
+                font-size: 8px;
                 max-width: 100px;
             }
 
             .countdown {
-                font-size: 3em; /* slightly smaller countdown */
+                font-size: 3em;
             }
 
             video, canvas {
-                width: 80vw;               /* 80% of viewport width */
-                max-width: 200px;          /* limit max size */
-                height: calc(80vw * 5 / 4); /* proportional 4:5 */
-                max-height: 300px;         /* optional max height */
+                width: 80vw;
+                max-width: 200px;
+                height: calc(80vw * 5 / 4);
+                max-height: 300px;
                 object-fit: cover;
             }
 
@@ -268,18 +264,15 @@
             }
 
             .floatGroup {
-                z-index: 10000; /* floating images on top of everything */
+                z-index: 10000;
             }
         }
-
     </style>
 </head>
 <body>
 
-    <!-- Typewriter text top-left -->
     <div id="typewriter"></div>
 
-    <!-- Clock + Date bottom-right -->
     <div id="clockWrapper">
         <div id="dateDisplay"></div>
         <div id="clockDisplay"></div>
@@ -287,7 +280,9 @@
 
     <div class="container">
 
-        <video id="video" autoplay></video>
+        <!-- FIX #1 — playsinline muted added -->
+        <video id="video" autoplay playsinline muted></video>
+
         <canvas id="canvas"></canvas>
         
         <div id="countdown" class="countdown">3</div>
@@ -318,7 +313,10 @@
         let countdownValue = 3;
         let pendingText = "";
 
-        navigator.mediaDevices.getUserMedia({ video: true })
+        /* FIX #2 — facingMode added */
+        navigator.mediaDevices.getUserMedia({ 
+            video: { facingMode: "user" } 
+        })
         .then(stream => video.srcObject = stream)
         .catch(err => console.error("Camera error: ", err));
 
@@ -419,7 +417,6 @@
             startCountdown();
         });
 
-        /* Live Clock Script */
         function updateClock() {
             const now = new Date();
 
@@ -443,7 +440,6 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // Typewriter effect
         const typewriterText = "try to see if your photo memories will last.";
         const typewriterDiv = document.getElementById("typewriter");
         let index = 0;
@@ -452,7 +448,7 @@
             if (index < typewriterText.length) {
                 typewriterDiv.textContent += typewriterText.charAt(index);
                 index++;
-                setTimeout(typeWriter, 100); // typing speed in ms
+                setTimeout(typeWriter, 100);
             }
         }
 
