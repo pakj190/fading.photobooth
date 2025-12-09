@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fading Memories Start</title>
+    <link rel="stylesheet" href="info.css">
+    <style>
+        .center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            text-align: center;
+            color: white;
+            font-size: 24px;
+            font-family: "Georgia", serif;
+            z-index: 50; /* Ensure it stays above fog */
+        }
+    </style>
+</head>
+<body>
+
+<div class="center-text">
+    Memories fade over time. So this website is supposed to capture moments in your life but not every moment will stay and will fade.
+</div>
+
+<!-- Fog layers -->
+<div class="fog"></div>
+<div class="fog2"></div>
+
+<!-- Container that holds all memory words -->
+<div id="memory-container"></div>
+
+<img src="../phone.png" class="phone-icon" alt="phone icon">
+
+<script>
+    // Memory animation script
+    const fonts = [
+        "Georgia", "Times New Roman", "Garamond",
+        "Arial", "Verdana", "Courier New",
+        "Trebuchet MS", "Lucida Console", "Impact"
+    ];
+
+    const memoryVariations = [
+        "memory",
+        "memory memory",
+        "memory memory memory",
+        "lost memory",
+        "fading memory",
+        "a memory",
+        "memory?"
+    ];
+
+    function spawnMemory() {
+        const mem = document.createElement("div");
+        mem.classList.add("memory-word");
+
+        mem.textContent = memoryVariations[
+            Math.floor(Math.random() * memoryVariations.length)
+        ];
+
+        const size = Math.random() * 18 + 12; // 12–30px
+        mem.style.fontSize = size + "px";
+        mem.style.fontFamily = fonts[Math.floor(Math.random() * fonts.length)];
+        mem.style.left = Math.random() * 90 + "%";
+        mem.style.bottom = Math.random() * 40 + "%";
+
+        const duration = Math.random() * 3 + 3; // 3–6s
+        mem.style.animationDuration = duration + "s";
+
+        document.getElementById("memory-container").appendChild(mem);
+
+        setTimeout(() => mem.remove(), duration * 1000);
+        setTimeout(spawnMemory, Math.random() * 800 + 200);
+    }
+
+    spawnMemory();
+</script>
+
+</body>
+</html>
