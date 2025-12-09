@@ -133,13 +133,12 @@
             word-wrap: break-word;  /* wrap long text */
         }
 
-
         @keyframes floatAround {
-            0% { transform: translate(0, 0); }
-            25% { transform: translate(120px, -80px); }
-            50% { transform: translate(-90px, 60px); }
-            75% { transform: translate(100px, 120px); }
-            100% { transform: translate(-140px, -100px); }
+            0%   { transform: translate(0, 0); }
+            25%  { transform: translate(50px, -30px); }
+            50%  { transform: translate(-40px, 20px); }
+            75%  { transform: translate(30px, 40px); }
+            100% { transform: translate(-50px, -30px); }
         }
 
         /* Digital Clock Styling at bottom-right, glowing yellow, bold */
@@ -274,8 +273,13 @@
 
             const group = document.createElement("div");
             group.classList.add("floatGroup");
-            group.style.left = Math.random() * window.innerWidth + "px";
-            group.style.top = Math.random() * window.innerHeight + "px";
+
+            const imgWidth = 150;
+            const imgHeight = 150;
+
+            // Ensure starting position is fully on-screen
+            group.style.left = Math.random() * (window.innerWidth - imgWidth) + "px";
+            group.style.top = Math.random() * (window.innerHeight - imgHeight) + "px";
 
             const img = new Image();
             img.src = canvas.toDataURL("image/png");
