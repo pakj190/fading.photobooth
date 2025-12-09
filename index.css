@@ -150,3 +150,13 @@ body {
     75%  { opacity: .4; transform: translateY(0); }
     100% { opacity: 0; transform: translateY(-10px); }
 }
+
+.phone-icon {
+    position: fixed;
+    bottom: 15px;
+    left: 15px;
+    width: 120px;       /* adjust size */
+    opacity: 0.8;      /* optional slight fade */
+    pointer-events: none; /* so it doesn't block clicking */
+}
+

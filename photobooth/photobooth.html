@@ -195,6 +195,75 @@
             overflow: hidden;
         }
 
+        /* Responsive for mobile devices */
+        @media (max-width: 1100px) {
+            #clockWrapper {
+                bottom: 10px;
+                right: 50%;
+                transform: translateX(50%);
+                text-align: center;
+            }
+
+            #clockDisplay {
+                font-size: 20px; /* smaller clock */
+            }
+
+            #dateDisplay {
+                font-size: 10px; /* smaller date */
+                margin-bottom: 2px;
+            }
+
+            #typewriter {
+                top: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 16px; /* smaller typewriter text */
+                max-width: 80%;   /* fit within the screen */
+                white-space: normal; /* allow wrapping */
+                text-align: center;  /* center the text */
+                overflow: hidden;    /* optional: hide overflow */
+                margin: 0 auto; 
+            }
+
+
+            #userText {
+                width: 180px; /* fit smaller screen */
+                font-size: 14px;
+                padding: 6px 10px;
+            }
+
+            #submitText {
+                font-size: 14px;
+            }
+
+            .floatText {
+                font-size: 8px; /* smaller floating text */
+                max-width: 100px;
+            }
+
+            .countdown {
+                font-size: 3em; /* slightly smaller countdown */
+            }
+
+            video, canvas {
+                width: 80vw;               /* 80% of viewport width */
+                max-width: 320px;          /* limit max size */
+                height: calc(80vw * 5 / 4); /* proportional 4:5 */
+                max-height: 400px;         /* optional max height */
+                object-fit: cover;
+            }
+
+
+            .container {
+                padding: 10px;
+            }
+
+            button img {
+                width: 60px;
+                height: 60px;
+            }
+        }
+
     </style>
 </head>
 <body>
