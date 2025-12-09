@@ -195,6 +195,69 @@
             overflow: hidden;
         }
 
+        /* Responsive for mobile devices */
+        @media (max-width: 480px) {
+            #clockWrapper {
+                bottom: 10px;
+                right: 50%;
+                transform: translateX(50%);
+                text-align: center;
+            }
+
+            #clockDisplay {
+                font-size: 36px; /* smaller clock */
+            }
+
+            #dateDisplay {
+                font-size: 18px; /* smaller date */
+                margin-bottom: 2px;
+            }
+
+            #typewriter {
+                top: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                font-size: 16px; /* smaller typewriter text */
+            }
+
+            #userText {
+                width: 180px; /* fit smaller screen */
+                font-size: 14px;
+                padding: 6px 10px;
+            }
+
+            #submitText {
+                font-size: 14px;
+            }
+
+            .floatText {
+                font-size: 10px; /* smaller floating text */
+                max-width: 100px;
+            }
+
+            .floatGroup img {
+                width: 100px; /* optional smaller floating images */
+            }
+
+            .countdown {
+                font-size: 3em; /* slightly smaller countdown */
+            }
+
+            video, canvas {
+                width: 240px;
+                height: 180px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            button img {
+                width: 60px;
+                height: 60px;
+            }
+        }
+
     </style>
 </head>
 <body>
