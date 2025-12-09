@@ -40,16 +40,6 @@
             padding: 30px;
         }
 
-        h1 {
-            color: #ffffc2; /* bright yellow */
-            text-shadow: 
-                0 0 5px #ffffc2, 
-                0 0 10px #ffffc2, 
-                0 0 15px #ffff99;
-            margin-bottom: 20px;
-            padding: 30px;
-        }
-
         video, canvas {
             border: none;
         }
@@ -176,25 +166,41 @@
 
         #userText {
             background: transparent;
-            color: white;
+            color: white; /* keep this */
             outline: 2px solid rgba(0, 0, 0, 0.3);
             border-radius: 4px;
             padding: 8px 12px;
             font-family: 'Michroma', sans-serif;
             font-weight: 400;
             font-size: 16px;
-            text-shadow: 0 0 5px #ffffd3, 0 0 10px #ffff99;
+            text-shadow: 0 0 5px #ffffd3, 0 0 10px #ffff99; /* REMOVE this line */
             outline: none;
         }
 
+
         #userText::placeholder {
-            color: #ffff99;
-            text-shadow: 0 0 5px #ffffd3, 0 0 10px #ffffd3;
+            color: #ffffff;
+        }
+
+        /* Typewriter effect */
+        #typewriter {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-family: 'Michroma', sans-serif;
+            font-size: 24px;
+            color: #ffffc2;
+            text-shadow: 0 0 5px #ffffc2, 0 0 10px #ffff99;
+            white-space: nowrap;
+            overflow: hidden;
         }
 
     </style>
 </head>
 <body>
+
+    <!-- Typewriter text top-left -->
+    <div id="typewriter"></div>
 
     <!-- Clock + Date bottom-right -->
     <div id="clockWrapper">
@@ -203,7 +209,6 @@
     </div>
 
     <div class="container">
-        <h1>How long will your photo memory last?</h1>
 
         <video id="video" width="320" height="240" autoplay></video>
         <canvas id="canvas" width="320" height="240"></canvas>
@@ -346,6 +351,21 @@
 
         setInterval(updateClock, 1000);
         updateClock();
+
+        // Typewriter effect
+        const typewriterText = "try to see if your photo memories will last.";
+        const typewriterDiv = document.getElementById("typewriter");
+        let index = 0;
+
+        function typeWriter() {
+            if (index < typewriterText.length) {
+                typewriterDiv.textContent += typewriterText.charAt(index);
+                index++;
+                setTimeout(typeWriter, 100); // typing speed in ms
+            }
+        }
+
+        typeWriter();
     </script>
 </body>
 </html>
