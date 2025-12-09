@@ -1,108 +1,220 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Camera Background Effect</title>
-<style>
-    body {
-        margin: 0;
-        height: 100vh;
-        background: black;
-        overflow: hidden;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        font-family: Arial, sans-serif;
-    }
-
-    /* Centered camera image */
-    #camera {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 10;
-        width: 200px;
-        height: auto;
-    }
-
-    /* Random text elements */
-    .floating-text {
-        position: absolute;
-        color: white;
-        opacity: 0.5;
-        white-space: nowrap;
-        pointer-events: none;
-        font-size: 12px; /* small default size */
-        animation: fadeInOut 10s infinite; /* slow fade */
-    }
-
-    /* Glow effect */
-    .glow {
-        opacity: 1; /* full opacity for glowing */
-        text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 20px #0ff;
-    }
-
-    @keyframes fadeInOut {
-        0%, 100% { opacity: 0; }
-        50% { opacity: 1; }
-    }
-</style>
-</head>
-<body>
-
-<img id="camera" src="camera.png" alt="Camera">
-
-<script>
-    const texts = [
-        "Hello World", "Camera Ready", "Flash!", "Focus", 
-        "Click!", "Photography", "Snapshot", "Lens", "Shutter"
-    ];
-
-    const fonts = [
-        "Arial", "Verdana", "Tahoma", "Georgia", "Courier New", "Impact", "Comic Sans MS"
-    ];
-
-    function createRandomText() {
-        const text = document.createElement('div');
-        text.classList.add('floating-text');
-
-        // Random text content
-        text.innerText = texts[Math.floor(Math.random() * texts.length)];
-
-        // Random font
-        text.style.fontFamily = fonts[Math.floor(Math.random() * fonts.length)];
-
-        // Random position
-        text.style.top = Math.random() * window.innerHeight + 'px';
-        text.style.left = Math.random() * window.innerWidth + 'px';
-
-        // Random small size
-        text.style.fontSize = (10 + Math.random() * 14) + 'px'; // 10px to 24px
-
-        // Random glow
-        if (Math.random() > 0.5) {
-            text.classList.add('glow');
-        } else {
-            text.style.opacity = 0.5; // semi-transparent for non-glow
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fading Dairy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        // Random fade animation duration (slow)
-        const duration = 8 + Math.random() * 6; // 8s to 14s
-        text.style.animationDuration = duration + 's';
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: black;
+            overflow: hidden;
+        }
 
-        document.body.appendChild(text);
+        .container {
+            text-align: center;
+            background-color: black;
+            padding: 30px;
+        }
 
-        // Remove after duration
-        setTimeout(() => {
-            text.remove();
-        }, duration * 1000);
-    }
+        h1 {
+            color: white;
+            margin-bottom: 20px;
+        }
 
-    // Create random texts continuously
-    setInterval(createRandomText, 700);
-</script>
+        video, canvas {
+            border: none;
+        }
+
+        canvas {
+            display: none;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+        }
+
+        .countdown {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4em;
+            color: rgba(255,255,255,0.8);
+            font-weight: bold;
+            display: none;
+        }
+
+        button {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        button img {
+            width: 80px;
+            height: 80px;
+        }
+
+        #flash {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 9999;
+            transition: opacity 0.1s ease-out;
+        }
+
+        @keyframes shutter {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        .floating {
+            width: 150px;
+            height: auto;
+            position: absolute;
+            animation: floatAround 25s infinite alternate ease-in-out;
+            z-index: 999;
+        }
+
+        /* Timestamp styling */
+        .timestampFloating {
+            position: absolute;
+            font-size: 22px;
+            color: white;
+            font-weight: bold;
+            animation: floatAround 25s infinite alternate ease-in-out;
+            z-index: 999;
+            pointer-events: none;
+            text-shadow: 2px 2px 4px black;
+        }
+
+        @keyframes floatAround {
+            0% { transform: translate(0, 0); }
+            25% { transform: translate(120px, -80px); }
+            50% { transform: translate(-90px, 60px); }
+            75% { transform: translate(100px, 120px); }
+            100% { transform: translate(-140px, -100px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>How long will your photo memory last?</h1>
+
+        <video id="video" width="320" height="240" autoplay></video>
+        <canvas id="canvas" width="320" height="240"></canvas>
+        
+        <div id="countdown" class="countdown">3</div>
+
+        <div class="buttons">
+            <button id="capture">
+                <img src="camera.png" alt="Capture">
+            </button>
+        </div>
+
+        <div id="flash"></div>
+    </div>
+
+    <!-- Floating items container (images & timestamps) -->
+    <div id="floating-container"></div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const context = canvas.getContext('2d');
+        const captureButton = document.getElementById('capture');
+        const countdownDisplay = document.getElementById('countdown');
+        const flash = document.getElementById('flash');
+        const floatingContainer = document.getElementById('floating-container');
+
+        let countdownValue = 3;
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => video.srcObject = stream)
+        .catch(err => console.error("Camera error: ", err));
+
+        function triggerShutterEffect() {
+            flash.style.opacity = 1;
+            flash.style.animation = 'shutter 0.2s ease-out';
+            setTimeout(() => {
+                flash.style.opacity = 0;
+                flash.style.animation = '';
+            }, 200);
+        }
+
+        function startCountdown() {
+            countdownDisplay.style.display = 'block';
+            countdownValue = 3;
+
+            function next() {
+                countdownDisplay.textContent = countdownValue;
+                if (countdownValue === 0) {
+                    capturePhoto();
+                    countdownDisplay.style.display = 'none';
+                } else {
+                    countdownValue--;
+                    setTimeout(next, 1000);
+                }
+            }
+
+            next();
+        }
+
+        function capturePhoto() {
+            triggerShutterEffect();
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // === create floating image ===
+            const img = new Image();
+            img.src = canvas.toDataURL("image/png");
+            img.classList.add("floating");
+            img.style.left = Math.random() * window.innerWidth + "px";
+            img.style.top = Math.random() * window.innerHeight + "px";
+            floatingContainer.appendChild(img);
+
+            // ⭐ RANDOMLY DECIDE IF IMAGE FADES
+            const shouldFade = Math.random() < 0.7; // 70% chance to fade, 30% stay
+            if (shouldFade) {
+                const fadeTime = Math.random() * 15000 + 5000; // 5–20 seconds
+                setTimeout(() => {
+                    img.style.transition = "opacity 3s ease";
+                    img.style.opacity = "0";
+                    setTimeout(() => {
+                        if (img.parentNode) img.parentNode.removeChild(img);
+                    }, 3000);
+                }, fadeTime);
+            }
+
+            // === create floating timestamp ===
+            const timestamp = document.createElement("div");
+            timestamp.classList.add("timestampFloating");
+
+            const now = new Date();
+            timestamp.innerText = now.toLocaleString(); // date + time
+
+            timestamp.style.left = Math.random() * window.innerWidth + "px";
+            timestamp.style.top = Math.random() * window.innerHeight + "px";
+
+            floatingContainer.appendChild(timestamp);
+        }
+
+        captureButton.addEventListener('click', startCountdown);
+    </script>
 </body>
 </html>

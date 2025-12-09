@@ -12,7 +12,7 @@
         }
 
         body {
-            font-family: sans-serif;
+            font-family: 'Courier New', Courier, monospace;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -84,24 +84,26 @@
             100% { opacity: 0; }
         }
 
-        .floating {
-            width: 150px;
-            height: auto;
+        /* GROUP WRAPPER (image + text + timestamp floating together) */
+        .floatGroup {
             position: absolute;
-            animation: floatAround 25s infinite alternate ease-in-out;
-            z-index: 999;
-        }
-
-        /* Timestamp styling */
-        .timestampFloating {
-            position: absolute;
-            font-size: 22px;
-            color: white;
-            font-weight: bold;
             animation: floatAround 25s infinite alternate ease-in-out;
             z-index: 999;
             pointer-events: none;
+            text-align: center;
+        }
+
+        .floatGroup img {
+            width: 150px;
+            height: auto;
+        }
+
+        .floatText {
+            font-size: 20px;
+            color: white;
+            margin-top: 6px;
             text-shadow: 2px 2px 4px black;
+            font-weight: bold;
         }
 
         @keyframes floatAround {
@@ -111,6 +113,7 @@
             75% { transform: translate(100px, 120px); }
             100% { transform: translate(-140px, -100px); }
         }
+
     </style>
 </head>
 <body>
@@ -123,6 +126,15 @@
         <div id="countdown" class="countdown">3</div>
 
         <div class="buttons">
+            <!-- TEXT INPUT + SUBMIT -->
+            <div style="margin-bottom: 20px;">
+                <input id="userText" type="text" placeholder="Type something..." 
+                       style="padding: 8px; width: 250px;">
+                <button id="submitText" style="background:white; padding:8px; margin-left:5px;">
+                    Submit
+                </button>
+            </div>
+
             <button id="capture">
                 <img src="camera.png" alt="Capture">
             </button>
@@ -131,7 +143,6 @@
         <div id="flash"></div>
     </div>
 
-    <!-- Floating items container (images & timestamps) -->
     <div id="floating-container"></div>
 
     <script>
@@ -143,7 +154,11 @@
         const flash = document.getElementById('flash');
         const floatingContainer = document.getElementById('floating-container');
 
+        const submitText = document.getElementById("submitText");
+        const userText = document.getElementById("userText");
+
         let countdownValue = 3;
+        let pendingText = "";  // store text to attach under the image
 
         navigator.mediaDevices.getUserMedia({ video: true })
         .then(stream => video.srcObject = stream)
@@ -165,7 +180,7 @@
             function next() {
                 countdownDisplay.textContent = countdownValue;
                 if (countdownValue === 0) {
-                    capturePhoto();
+                    capturePhoto(pendingText);
                     countdownDisplay.style.display = 'none';
                 } else {
                     countdownValue--;
@@ -176,45 +191,65 @@
             next();
         }
 
-        function capturePhoto() {
+        function capturePhoto(attachedText) {
             triggerShutterEffect();
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // === create floating image ===
+            // Create group wrapper
+            const group = document.createElement("div");
+            group.classList.add("floatGroup");
+            group.style.left = Math.random() * window.innerWidth + "px";
+            group.style.top = Math.random() * window.innerHeight + "px";
+
+            // Photo
             const img = new Image();
             img.src = canvas.toDataURL("image/png");
-            img.classList.add("floating");
-            img.style.left = Math.random() * window.innerWidth + "px";
-            img.style.top = Math.random() * window.innerHeight + "px";
-            floatingContainer.appendChild(img);
 
-            // ⭐ RANDOMLY DECIDE IF IMAGE FADES
-            const shouldFade = Math.random() < 0.7; // 70% chance to fade, 30% stay
+            // User text
+            const textDiv = document.createElement("div");
+            textDiv.classList.add("floatText");
+            textDiv.innerText = attachedText;
+
+            // Timestamp
+            const timestampDiv = document.createElement("div");
+            timestampDiv.classList.add("floatText");
+            const now = new Date();
+            timestampDiv.innerText = now.toLocaleString();
+
+            // Assemble group: photo → text → timestamp
+            group.appendChild(img);
+            group.appendChild(textDiv);
+            group.appendChild(timestampDiv);
+
+            floatingContainer.appendChild(group);
+
+            // Fade logic
+            const shouldFade = Math.random() < 0.7;
             if (shouldFade) {
-                const fadeTime = Math.random() * 15000 + 5000; // 5–20 seconds
+                const fadeTime = Math.random() * 15000 + 5000;
                 setTimeout(() => {
-                    img.style.transition = "opacity 3s ease";
-                    img.style.opacity = "0";
+                    group.style.transition = "opacity 3s ease";
+                    group.style.opacity = "0";
                     setTimeout(() => {
-                        if (img.parentNode) img.parentNode.removeChild(img);
+                        if (group.parentNode) group.parentNode.removeChild(group);
                     }, 3000);
                 }, fadeTime);
             }
-
-            // === create floating timestamp ===
-            const timestamp = document.createElement("div");
-            timestamp.classList.add("timestampFloating");
-
-            const now = new Date();
-            timestamp.innerText = now.toLocaleString(); // date + time
-
-            timestamp.style.left = Math.random() * window.innerWidth + "px";
-            timestamp.style.top = Math.random() * window.innerHeight + "px";
-
-            floatingContainer.appendChild(timestamp);
         }
 
         captureButton.addEventListener('click', startCountdown);
+
+        // Submit: save text → start countdown → photo + text + timestamp appear together
+        submitText.addEventListener("click", () => {
+            const text = userText.value.trim();
+            if (text === "") {
+                alert("Please type something first!");
+                return;
+            }
+
+            pendingText = text;  
+            startCountdown();
+        });
     </script>
 </body>
 </html>
