@@ -203,15 +203,20 @@
                 right: 50%;
                 transform: translateX(50%);
                 text-align: center;
+                z-index: 1;  /* move behind floating images */
             }
 
             #clockDisplay {
                 font-size: 20px; /* smaller clock */
+                color: rgba(255,156,169,0.3);  /* softer background glow */
+                text-shadow: 0 0 20px rgba(255,156,169,0.3), 0 0 40px rgba(255,161,117,0.3);
             }
 
             #dateDisplay {
                 font-size: 10px; /* smaller date */
                 margin-bottom: 2px;
+                color: rgba(255,156,169,0.3); /* softer background glow */
+                text-shadow: 0 0 15px rgba(255,156,169,0.3), 0 0 25px rgba(255,161,117,0.3);
             }
 
             #typewriter {
@@ -260,6 +265,10 @@
             button img {
                 width: 60px;
                 height: 60px;
+            }
+
+            .floatGroup {
+                z-index: 10000; /* floating images on top of everything */
             }
         }
 
@@ -343,13 +352,12 @@
         function capturePhoto(attachedText) {
             triggerShutterEffect();
 
-            // Set canvas to maintain 4:5 aspect ratio for smaller screens
             const screenWidth = window.innerWidth;
             let canvasWidth, canvasHeight;
 
             if (screenWidth <= 1100) {
                 canvasWidth = Math.min(video.videoWidth, 320);
-                canvasHeight = canvasWidth * 5 / 4; // 4:5 aspect ratio
+                canvasHeight = canvasWidth * 5 / 4;
             } else {
                 canvasWidth = video.videoWidth;
                 canvasHeight = video.videoHeight;
