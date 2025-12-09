@@ -41,8 +41,11 @@
         }
 
         video, canvas {
-            border: none;
+            width: 480px;       /* smaller default width for desktop */
+            height: 480 * 5 / 4; /* maintain 4:5 aspect ratio */
+            object-fit: cover;
         }
+
 
         canvas {
             display: none;
@@ -173,10 +176,8 @@
             font-family: 'Michroma', sans-serif;
             font-weight: 400;
             font-size: 16px;
-            text-shadow: 0 0 5px #ffffd3, 0 0 10px #ffff99; /* REMOVE this line */
             outline: none;
         }
-
 
         #userText::placeholder {
             color: #ffffff;
@@ -225,7 +226,6 @@
                 margin: 0 auto; 
             }
 
-
             #userText {
                 width: 180px; /* fit smaller screen */
                 font-size: 14px;
@@ -253,7 +253,6 @@
                 object-fit: cover;
             }
 
-
             .container {
                 padding: 10px;
             }
@@ -279,8 +278,8 @@
 
     <div class="container">
 
-        <video id="video" width="320" height="240" autoplay></video>
-        <canvas id="canvas" width="320" height="240"></canvas>
+        <video id="video" autoplay></video>
+        <canvas id="canvas"></canvas>
         
         <div id="countdown" class="countdown">3</div>
 
@@ -343,6 +342,22 @@
 
         function capturePhoto(attachedText) {
             triggerShutterEffect();
+
+            // Set canvas to maintain 4:5 aspect ratio for smaller screens
+            const screenWidth = window.innerWidth;
+            let canvasWidth, canvasHeight;
+
+            if (screenWidth <= 1100) {
+                canvasWidth = Math.min(video.videoWidth, 320);
+                canvasHeight = canvasWidth * 5 / 4; // 4:5 aspect ratio
+            } else {
+                canvasWidth = video.videoWidth;
+                canvasHeight = video.videoHeight;
+            }
+
+            canvas.width = canvasWidth;
+            canvas.height = canvasHeight;
+
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
             const group = document.createElement("div");
@@ -351,7 +366,6 @@
             const imgWidth = 150;
             const imgHeight = 150;
 
-            // Ensure starting position is fully on-screen
             group.style.left = Math.random() * (window.innerWidth - imgWidth) + "px";
             group.style.top = Math.random() * (window.innerHeight - imgHeight) + "px";
 
