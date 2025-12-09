@@ -3,16 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fading Dairy</title>
+    <title>JustFilm Photo Booth</title>
+
+    <!-- Google Font Michroma -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">
+
     <style>
+        /* Apply Michroma to all elements */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Michroma', sans-serif;
+        }
+
+        .michroma-regular {
+            font-family: 'Michroma', sans-serif;
+            font-weight: 400;
+            font-style: normal;
         }
 
         body {
-            font-family: 'Courier New', Courier, monospace;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -28,8 +41,13 @@
         }
 
         h1 {
-            color: white;
+            color: #ffffc2; /* bright yellow */
+            text-shadow: 
+                0 0 5px #ffffc2, 
+                0 0 10px #ffffc2, 
+                0 0 15px #ffff99;
             margin-bottom: 20px;
+            padding: 30px;
         }
 
         video, canvas {
@@ -58,11 +76,19 @@
             background: none;
             border: none;
             cursor: pointer;
+            font-family: 'Michroma', sans-serif;
+            color: white;
         }
 
         button img {
             width: 80px;
             height: 80px;
+        }
+
+        #submitText {
+            font-family: 'Michroma', sans-serif;
+            font-weight: 400;
+            font-size: 16px;
         }
 
         #flash {
@@ -84,24 +110,25 @@
             100% { opacity: 0; }
         }
 
-        .floating {
-            width: 150px;
-            height: auto;
+        .floatGroup {
             position: absolute;
-            animation: floatAround 25s infinite alternate ease-in-out;
-            z-index: 999;
-        }
-
-        /* Timestamp styling */
-        .timestampFloating {
-            position: absolute;
-            font-size: 22px;
-            color: white;
-            font-weight: bold;
             animation: floatAround 25s infinite alternate ease-in-out;
             z-index: 999;
             pointer-events: none;
+            text-align: center;
+        }
+
+        .floatGroup img {
+            width: 150px;
+            height: auto;
+        }
+
+        .floatText {
+            font-size: 20px;
+            color: white;
+            margin-top: 6px;
             text-shadow: 2px 2px 4px black;
+            font-weight: bold;
         }
 
         @keyframes floatAround {
@@ -111,9 +138,68 @@
             75% { transform: translate(100px, 120px); }
             100% { transform: translate(-140px, -100px); }
         }
+
+        /* Digital Clock Styling at bottom-right, glowing yellow, bold */
+        #clockWrapper {
+            position: absolute;
+            bottom: 20px;       
+            right: 20px;
+            text-align: right;
+            z-index: 5000;
+            pointer-events: none;
+            font-family: 'Michroma', sans-serif;
+            font-weight: bold;
+        }
+
+        #clockDisplay {
+            font-size: 60px;
+            color: #ff9ca9;
+            text-shadow: 0 0 10px #ff9ca9, 0 0 20px #ffa175, 0 0 30px #ffa175;
+            margin: 0;
+        }
+
+        #dateDisplay {
+            font-size: 28px;
+            color: #ff9ca9;
+            text-shadow: 0 0 8px #ff9ca9, 0 0 12px #ffa175;
+            margin-bottom: 4px;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            width: 250px;
+            font-family: 'Michroma', sans-serif;
+            font-weight: 400;
+        }
+
+        #userText {
+            background: transparent;
+            color: white;
+            outline: 2px solid rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-family: 'Michroma', sans-serif;
+            font-weight: 400;
+            font-size: 16px;
+            text-shadow: 0 0 5px #ffffd3, 0 0 10px #ffff99;
+            outline: none;
+        }
+
+        #userText::placeholder {
+            color: #ffff99;
+            text-shadow: 0 0 5px #ffffd3, 0 0 10px #ffffd3;
+        }
+
     </style>
 </head>
 <body>
+
+    <!-- Clock + Date bottom-right -->
+    <div id="clockWrapper">
+        <div id="dateDisplay"></div>
+        <div id="clockDisplay"></div>
+    </div>
+
     <div class="container">
         <h1>How long will your photo memory last?</h1>
 
@@ -123,27 +209,30 @@
         <div id="countdown" class="countdown">3</div>
 
         <div class="buttons">
-            <button id="capture">
-                <img src="camera.png" alt="Capture">
-            </button>
+            <div style="margin-bottom: 20px;">
+                <input id="userText" type="text" placeholder="Type something...">
+                <button id="submitText">Submit</button>
+            </div>
         </div>
 
         <div id="flash"></div>
     </div>
 
-    <!-- Floating items container (images & timestamps) -->
     <div id="floating-container"></div>
 
     <script>
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const context = canvas.getContext('2d');
-        const captureButton = document.getElementById('capture');
         const countdownDisplay = document.getElementById('countdown');
         const flash = document.getElementById('flash');
         const floatingContainer = document.getElementById('floating-container');
 
+        const submitText = document.getElementById("submitText");
+        const userText = document.getElementById("userText");
+
         let countdownValue = 3;
+        let pendingText = "";
 
         navigator.mediaDevices.getUserMedia({ video: true })
         .then(stream => video.srcObject = stream)
@@ -165,7 +254,7 @@
             function next() {
                 countdownDisplay.textContent = countdownValue;
                 if (countdownValue === 0) {
-                    capturePhoto();
+                    capturePhoto(pendingText);
                     countdownDisplay.style.display = 'none';
                 } else {
                     countdownValue--;
@@ -176,45 +265,80 @@
             next();
         }
 
-        function capturePhoto() {
+        function capturePhoto(attachedText) {
             triggerShutterEffect();
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // === create floating image ===
+            const group = document.createElement("div");
+            group.classList.add("floatGroup");
+            group.style.left = Math.random() * window.innerWidth + "px";
+            group.style.top = Math.random() * window.innerHeight + "px";
+
             const img = new Image();
             img.src = canvas.toDataURL("image/png");
-            img.classList.add("floating");
-            img.style.left = Math.random() * window.innerWidth + "px";
-            img.style.top = Math.random() * window.innerHeight + "px";
-            floatingContainer.appendChild(img);
 
-            // ⭐ RANDOMLY DECIDE IF IMAGE FADES
-            const shouldFade = Math.random() < 0.7; // 70% chance to fade, 30% stay
+            const textDiv = document.createElement("div");
+            textDiv.classList.add("floatText");
+            textDiv.innerText = attachedText;
+
+            const timestampDiv = document.createElement("div");
+            timestampDiv.classList.add("floatText");
+            const now = new Date();
+            timestampDiv.innerText = now.toLocaleString();
+
+            group.appendChild(img);
+            group.appendChild(textDiv);
+            group.appendChild(timestampDiv);
+
+            floatingContainer.appendChild(group);
+
+            const shouldFade = Math.random() < 0.7;
             if (shouldFade) {
-                const fadeTime = Math.random() * 15000 + 5000; // 5–20 seconds
+                const fadeTime = Math.random() * 15000 + 5000;
                 setTimeout(() => {
-                    img.style.transition = "opacity 3s ease";
-                    img.style.opacity = "0";
+                    group.style.transition = "opacity 3s ease";
+                    group.style.opacity = "0";
                     setTimeout(() => {
-                        if (img.parentNode) img.parentNode.removeChild(img);
+                        if (group.parentNode) group.parentNode.removeChild(group);
                     }, 3000);
                 }, fadeTime);
             }
-
-            // === create floating timestamp ===
-            const timestamp = document.createElement("div");
-            timestamp.classList.add("timestampFloating");
-
-            const now = new Date();
-            timestamp.innerText = now.toLocaleString(); // date + time
-
-            timestamp.style.left = Math.random() * window.innerWidth + "px";
-            timestamp.style.top = Math.random() * window.innerHeight + "px";
-
-            floatingContainer.appendChild(timestamp);
         }
 
-        captureButton.addEventListener('click', startCountdown);
+        submitText.addEventListener("click", () => {
+            const text = userText.value.trim();
+            if (text === "") {
+                alert("Please type something first!");
+                return;
+            }
+
+            pendingText = text;  
+            startCountdown();
+        });
+
+        /* Live Clock Script */
+        function updateClock() {
+            const now = new Date();
+
+            let h = String(now.getHours()).padStart(2, "0");
+            let m = String(now.getMinutes()).padStart(2, "0");
+            let s = String(now.getSeconds()).padStart(2, "0");
+
+            document.getElementById("clockDisplay").textContent = `${h}:${m}:${s}`;
+
+            const dateOptions = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+
+            document.getElementById("dateDisplay").textContent =
+                now.toLocaleDateString(undefined, dateOptions);
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
     </script>
 </body>
 </html>

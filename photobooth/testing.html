@@ -4,15 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JustFilm Photo Booth</title>
+
+    <!-- Google Font Michroma -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Michroma&display=swap" rel="stylesheet">
+
     <style>
+        /* Apply Michroma to all elements */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Michroma', sans-serif;
+        }
+
+        .michroma-regular {
+            font-family: 'Michroma', sans-serif;
+            font-weight: 400;
+            font-style: normal;
         }
 
         body {
-            font-family: 'Courier New', Courier, monospace;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -28,8 +41,13 @@
         }
 
         h1 {
-            color: white;
+            color: #ffffc2; /* bright yellow */
+            text-shadow: 
+                0 0 5px #ffffc2, 
+                0 0 10px #ffffc2, 
+                0 0 15px #ffff99;
             margin-bottom: 20px;
+            padding: 30px;
         }
 
         video, canvas {
@@ -58,11 +76,19 @@
             background: none;
             border: none;
             cursor: pointer;
+            font-family: 'Michroma', sans-serif;
+            color: white;
         }
 
         button img {
             width: 80px;
             height: 80px;
+        }
+
+        #submitText {
+            font-family: 'Michroma', sans-serif;
+            font-weight: 400;
+            font-size: 16px;
         }
 
         #flash {
@@ -84,7 +110,6 @@
             100% { opacity: 0; }
         }
 
-        /* GROUP WRAPPER (image + text + timestamp floating together) */
         .floatGroup {
             position: absolute;
             animation: floatAround 25s infinite alternate ease-in-out;
@@ -99,12 +124,15 @@
         }
 
         .floatText {
-            font-size: 20px;
+            font-size: 12px;        /* smaller text */
             color: white;
-            margin-top: 6px;
-            text-shadow: 2px 2px 4px black;
+            margin-top: 4px;
+            text-shadow: 1px 1px 2px black;
             font-weight: bold;
+            max-width: 150px;       /* limit width */
+            word-wrap: break-word;  /* wrap long text */
         }
+
 
         @keyframes floatAround {
             0% { transform: translate(0, 0); }
@@ -114,9 +142,67 @@
             100% { transform: translate(-140px, -100px); }
         }
 
+        /* Digital Clock Styling at bottom-right, glowing yellow, bold */
+        #clockWrapper {
+            position: absolute;
+            bottom: 20px;       
+            right: 20px;
+            text-align: right;
+            z-index: 5000;
+            pointer-events: none;
+            font-family: 'Michroma', sans-serif;
+            font-weight: bold;
+        }
+
+        #clockDisplay {
+            font-size: 60px;
+            color: #ff9ca9;
+            text-shadow: 0 0 10px #ff9ca9, 0 0 20px #ffa175, 0 0 30px #ffa175;
+            margin: 0;
+        }
+
+        #dateDisplay {
+            font-size: 28px;
+            color: #ff9ca9;
+            text-shadow: 0 0 8px #ff9ca9, 0 0 12px #ffa175;
+            margin-bottom: 4px;
+        }
+
+        input[type="text"] {
+            padding: 8px;
+            width: 250px;
+            font-family: 'Michroma', sans-serif;
+            font-weight: 400;
+        }
+
+        #userText {
+            background: transparent;
+            color: white;
+            outline: 2px solid rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            padding: 8px 12px;
+            font-family: 'Michroma', sans-serif;
+            font-weight: 400;
+            font-size: 16px;
+            text-shadow: 0 0 5px #ffffd3, 0 0 10px #ffff99;
+            outline: none;
+        }
+
+        #userText::placeholder {
+            color: #ffff99;
+            text-shadow: 0 0 5px #ffffd3, 0 0 10px #ffffd3;
+        }
+
     </style>
 </head>
 <body>
+
+    <!-- Clock + Date bottom-right -->
+    <div id="clockWrapper">
+        <div id="dateDisplay"></div>
+        <div id="clockDisplay"></div>
+    </div>
+
     <div class="container">
         <h1>How long will your photo memory last?</h1>
 
@@ -126,18 +212,10 @@
         <div id="countdown" class="countdown">3</div>
 
         <div class="buttons">
-            <!-- TEXT INPUT + SUBMIT -->
             <div style="margin-bottom: 20px;">
-                <input id="userText" type="text" placeholder="Type something..." 
-                       style="padding: 8px; width: 250px;">
-                <button id="submitText" style="background:white; padding:8px; margin-left:5px;">
-                    Submit
-                </button>
+                <input id="userText" type="text" placeholder="Type something...">
+                <button id="submitText">Submit</button>
             </div>
-
-            <button id="capture">
-                <img src="camera.png" alt="Capture">
-            </button>
         </div>
 
         <div id="flash"></div>
@@ -149,7 +227,6 @@
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const context = canvas.getContext('2d');
-        const captureButton = document.getElementById('capture');
         const countdownDisplay = document.getElementById('countdown');
         const flash = document.getElementById('flash');
         const floatingContainer = document.getElementById('floating-container');
@@ -158,7 +235,7 @@
         const userText = document.getElementById("userText");
 
         let countdownValue = 3;
-        let pendingText = "";  // store text to attach under the image
+        let pendingText = "";
 
         navigator.mediaDevices.getUserMedia({ video: true })
         .then(stream => video.srcObject = stream)
@@ -195,35 +272,29 @@
             triggerShutterEffect();
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Create group wrapper
             const group = document.createElement("div");
             group.classList.add("floatGroup");
             group.style.left = Math.random() * window.innerWidth + "px";
             group.style.top = Math.random() * window.innerHeight + "px";
 
-            // Photo
             const img = new Image();
             img.src = canvas.toDataURL("image/png");
 
-            // User text
             const textDiv = document.createElement("div");
             textDiv.classList.add("floatText");
             textDiv.innerText = attachedText;
 
-            // Timestamp
             const timestampDiv = document.createElement("div");
             timestampDiv.classList.add("floatText");
             const now = new Date();
             timestampDiv.innerText = now.toLocaleString();
 
-            // Assemble group: photo → text → timestamp
             group.appendChild(img);
             group.appendChild(textDiv);
             group.appendChild(timestampDiv);
 
             floatingContainer.appendChild(group);
 
-            // Fade logic
             const shouldFade = Math.random() < 0.7;
             if (shouldFade) {
                 const fadeTime = Math.random() * 15000 + 5000;
@@ -237,9 +308,6 @@
             }
         }
 
-        captureButton.addEventListener('click', startCountdown);
-
-        // Submit: save text → start countdown → photo + text + timestamp appear together
         submitText.addEventListener("click", () => {
             const text = userText.value.trim();
             if (text === "") {
@@ -250,6 +318,30 @@
             pendingText = text;  
             startCountdown();
         });
+
+        /* Live Clock Script */
+        function updateClock() {
+            const now = new Date();
+
+            let h = String(now.getHours()).padStart(2, "0");
+            let m = String(now.getMinutes()).padStart(2, "0");
+            let s = String(now.getSeconds()).padStart(2, "0");
+
+            document.getElementById("clockDisplay").textContent = `${h}:${m}:${s}`;
+
+            const dateOptions = {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+
+            document.getElementById("dateDisplay").textContent =
+                now.toLocaleDateString(undefined, dateOptions);
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
     </script>
 </body>
 </html>
